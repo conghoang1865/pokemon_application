@@ -1,0 +1,146 @@
+<div class="container-fluid mt-5">
+  <mat-form-field>
+    <mat-label>Pokemon types</mat-label>
+    <mat-select
+      [(ngModel)]="selectedValue"
+      (ngModelChange)="applyFilterPokemonType($event)"
+      name="id"
+    >
+      <mat-option
+        *ngFor="let type of ListSelectTypes$ | async"
+        [value]="type.id"
+      >
+        {{ type.name }}
+      </mat-option>
+    </mat-select>
+    <button
+      mat-button
+      *ngIf="selectedValue"
+      matSuffix
+      mat-icon-button
+      type="button"
+      aria-label="Clear"
+      (click)="deleteFilterPokemonType(); $event.stopPropagation()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+  <h2 *ngIf="selectedValue" class="text-success">
+    Show search results with type: {{ typeText }}
+  </h2>
+  <mat-progress-bar
+    mode="query"
+    *ngIf="store.isLoading$ | async"
+  ></mat-progress-bar>
+  <div class="">
+    <mat-table
+      [dataSource]="dataSource"
+      matSort
+      class="mat-elevation-z1 table table-responsive"
+      (matSortChange)="sortChange($event)"
+    >
+      @for (column of columns; track column) {
+      <ng-container [matColumnDef]="column.columnDef">
+        <mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ column.header }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <span [ngClass]="column.className">
+            {{ column.cell(row) }}
+          </span>
+        </mat-cell>
+      </ng-container>
+      }
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        (click)="getPokemonDetail(row.id, pokemonDetail)"
+        *matRowDef="let row; columns: displayedColumns"
+      ></mat-row>
+    </mat-table>
+  </div>
+  <mat-paginator
+    #paginator
+    *ngIf="store.meta$ | async as meta"
+    [pageIndex]="meta.current_page - 1"
+    [length]="meta.total"
+    [pageSize]="meta.per_page"
+    [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  >
+  </mat-paginator>
+</div>
+
+<ng-template #pokemonDetail let-c="close" let-d="dismiss">
+  <div class="pokemon-card">
+    <div class="modal-header">
+      <h4 class="modal-title" style="color: #800000; margin: 0px">
+        Pokemon detail
+      </h4>
+      <button mat-button type="button" (click)="d('Cross click')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <spinner *ngIf="store.isLoading$ | async"></spinner>
+    <img [src]="pokemonImage" alt="Bulbasaur" />
+    <div *ngIf="pokemonDetail$ | async as pokemon">
+      <h2>{{ pokemon.name }}</h2>
+      <div class="type">
+        <span class="grass" *ngIf="pokemon.type_1">{{
+          returnPokemonTypeText(pokemon.type_1)
+        }}</span>
+        <span class="poison" *ngIf="pokemon.type_2">{{
+          returnPokemonTypeText(pokemon.type_2)
+        }}</span>
+      </div>
+      <div class="row m-1 p-2">
+        <label
+          [label]="'HP'"
+          [value]="pokemon.hp"
+          [classNameText]="'text-sucess'"
+        ></label>
+        <label
+          [label]="'Attack'"
+          [value]="pokemon.attack"
+          [classNameText]="'text-danger'"
+        ></label>
+        <label
+          [label]="'Sp_atk'"
+          [value]="pokemon.sp_atk"
+          [classNameText]="'text-danger'"
+        ></label>
+        <label
+          [label]="'Defence'"
+          [value]="pokemon.defense"
+          [classNameText]="'text-primary'"
+        ></label>
+        <label
+          [label]="'Sp_def'"
+          [value]="pokemon.sp_def"
+          [classNameText]="'text-primary'"
+        ></label>
+        <label
+          [label]="'Generation'"
+          [value]="pokemon.generation"
+          [classNameText]="'text-indigo'"
+        ></label>
+        <label
+          [label]="'Legendary'"
+          [value]="pokemon.legendary"
+          [classNameText]="'text-indigo'"
+        ></label>
+        <label
+          [label]="'Speed'"
+          [value]="pokemon.speed"
+          [classNameText]="'text-indigo'"
+        ></label>
+        <label
+          [label]="'Total'"
+          [value]="pokemon.total"
+          [classNameText]="'font-weight-bold'"
+        ></label>
+      </div>
+    </div>
+  </div>
+</ng-template>
