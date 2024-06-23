@@ -3,3 +3,4 @@ export const environment = {
   isMockEnabled: false,
   api_endpoint: 'https://api.vandvietnam.com/api/pokemon-api',
 };
+
