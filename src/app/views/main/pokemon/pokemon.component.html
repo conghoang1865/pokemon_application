@@ -78,9 +78,6 @@
       <h4 class="modal-title" style="color: #800000; margin: 0px">
         Pokemon detail
       </h4>
-      <button mat-button type="button" (click)="d('Cross click')">
-        <mat-icon>close</mat-icon>
-      </button>
     </div>
     <spinner *ngIf="store.isLoading$ | async"></spinner>
     <img [src]="pokemonImage" alt="Bulbasaur" />
